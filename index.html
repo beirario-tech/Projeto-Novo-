@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Paletes & Expedição | Sistema de Transferência entre Lojas</title>
+  <meta name="description" content="Sistema profissional de controle logístico de paletes, geração e impressão de etiquetas para colar nos volumes com código de barras, QR code e romaneio de carga.">
+  <meta name="theme-color" content="#0b0f19">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos da Aplicação -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Barra Superior / Header -->
+  <header class="app-header no-print">
+    <div class="brand-wrapper">
+      <div class="brand-icon" aria-hidden="true">📦</div>
+      <div class="brand-text">
+        <h1>
+          PalletFlow Pro
+          <span class="brand-badge">Logística & Expedição</span>
+        </h1>
+        <p class="brand-subtitle">Controle de Paletes e Impressão de Volumes de Transferência</p>
+      </div>
+    </div>
+
+    <!-- Navegação por Abas -->
+    <nav class="nav-tabs" aria-label="Navegação do Sistema">
+      <button type="button" class="nav-tab-btn" data-tab="dashboard" id="tab-btn-dashboard">
+        <span>📊</span>
+        <span>Dashboard & Saldo</span>
+      </button>
+      <button type="button" class="nav-tab-btn active" data-tab="new-expedition" id="tab-btn-expedition">
+        <span>🏷️</span>
+        <span>Nova Expedição & Etiquetas</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="history" id="tab-btn-history">
+        <span>📋</span>
+        <span>Histórico & Romaneios</span>
+        <span class="nav-badge-count" id="history-count-badge">0</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="settings" id="tab-btn-settings">
+        <span>⚙️</span>
+        <span>Lojas & Conferentes</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="app-container">
+
+    <!-- KPI Cards de Desempenho Logístico -->
+    <section class="kpi-grid no-print" aria-label="Métricas da Operação">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-blue">📦</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Paletes Expedidos Hoje</div>
+          <div class="kpi-value" id="kpi-today-pallets">0</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-green">🚛</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Veículos Despachados</div>
+          <div class="kpi-value" id="kpi-today-shipments">0</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-amber">🏬</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Lojas Atendidas</div>
+          <div class="kpi-value" id="kpi-active-stores">0</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-purple">⏱️</div>
+        <div class="kpi-info">
+          <div class="kpi-label">Cargas em Trânsito</div>
+          <div class="kpi-value" id="kpi-in-transit">0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 0: DASHBOARD ANALÍTICO & SALDO DE PALETES -->
+    <div class="tab-content-panel no-print" id="tab-dashboard" style="display: none;">
+      <div class="dashboard-grid-layout">
+        
+        <!-- Dashboard Header / Toolbar Executiva -->
+        <div class="dashboard-toolbar">
+          <div class="dash-toolbar-left">
+            <div class="live-status-pill">
+              <span class="status-dot-pulse"></span>
+              <span>OPERAÇÃO LOGÍSTICA ATIVA • CD CENTRAL</span>
+            </div>
+            <div class="dash-toolbar-title">
+              <h2>Centro de Inteligência & Gestão de Paletes</h2>
+              <p>Monitoramento executivo de estoque físico, transferências, acurácia e valor patrimonial</p>
+            </div>
+          </div>
+          <div class="dash-toolbar-right">
+            <div class="time-filter-group" id="dash-time-filter-group">
+              <button type="button" class="time-filter-btn active" data-period="7">7 Dias</button>
+              <button type="button" class="time-filter-btn" data-period="15">15 Dias</button>
+              <button type="button" class="time-filter-btn" data-period="30">30 Dias</button>
+              <button type="button" class="time-filter-btn" data-period="all">Geral</button>
+            </div>
+            <button type="button" class="btn btn-primary btn-glow" id="btn-open-modal-entry">
+              📥 + Registrar Entrada / Retorno
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-refresh-dashboard" title="Atualizar dados do dashboard">
+              🔄 Atualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Banner de Patrimônio Total & Ticker Financeiro -->
+        <div class="dash-asset-banner">
+          <div class="asset-banner-left">
+            <span class="asset-banner-tag">PATRIMÔNIO ATIVO EM PALETES</span>
+            <div class="asset-banner-val-wrap">
+              <span class="asset-banner-currency">R$</span>
+              <span class="asset-banner-number" id="dash-banner-total-val">0,00</span>
+              <span class="asset-banner-badge" id="dash-banner-change">● Saldo em Armazém</span>
+            </div>
+            <div class="asset-banner-sub">
+              Valoração por Modelo: <strong style="color: #f59e0b;">PBR R$ 89,90</strong> • <strong style="color: #94a3b8;">Desc. R$ 59,90</strong> • <strong style="color: #3b82f6;">CHEP R$ 100,90</strong> • Saldo Físico: <strong id="dash-banner-pallets-count" style="color: #60a5fa;">0 unidades</strong>
+            </div>
+          </div>
+          <div class="asset-banner-stats">
+            <div class="asset-stat-box">
+              <span class="stat-box-lbl">Paletes PBR</span>
+              <span class="stat-box-val" id="banner-pbr-val">0 un</span>
+              <span class="stat-box-money" id="banner-pbr-money">R$ 0,00</span>
+            </div>
+            <div class="asset-stat-box">
+              <span class="stat-box-lbl">Descartáveis</span>
+              <span class="stat-box-val" id="banner-desc-val">0 un</span>
+              <span class="stat-box-money" id="banner-desc-money">R$ 0,00</span>
+            </div>
+            <div class="asset-stat-box">
+              <span class="stat-box-lbl">Pooler CHEP</span>
+              <span class="stat-box-val" id="banner-chep-val">0 un</span>
+              <span class="stat-box-money" id="banner-chep-money">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Top Cards Modernos (Glassmorphism & Glow) -->
+        <div class="dash-top-metrics">
+          
+          <div class="dash-card dash-card-balance">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-label">Saldo Físico no CD</span>
+                <div class="dash-card-main-val" id="dash-balance-total">0</div>
+              </div>
+              <div class="dash-card-icon icon-emerald">📦</div>
+            </div>
+            <div class="dash-card-sub">
+              <span>Valor em Ativo:</span>
+              <span class="currency-badge currency-emerald" id="dash-balance-value">R$ 0,00</span>
+            </div>
+            <div class="dash-card-mini-breakdown" id="dash-balance-mini-breakdown">
+              <span>Carregando dados...</span>
+            </div>
+          </div>
+
+          <div class="dash-card dash-card-exits">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-label">Saídas (Transferências)</span>
+                <div class="dash-card-main-val" id="dash-exits-total">0</div>
+              </div>
+              <div class="dash-card-icon icon-blue">📤</div>
+            </div>
+            <div class="dash-card-sub">
+              <span>Total Expedido:</span>
+              <span class="currency-badge currency-blue" id="dash-exits-value">R$ 0,00</span>
+            </div>
+            <div class="dash-card-mini-breakdown">
+              <span style="color: #60a5fa;">● Envio contínuo para filiais</span>
+            </div>
+          </div>
+
+          <div class="dash-card dash-card-entries">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-label">Entradas (Retorno de Lojas)</span>
+                <div class="dash-card-main-val" id="dash-entries-total">0</div>
+              </div>
+              <div class="dash-card-icon icon-purple">📥</div>
+            </div>
+            <div class="dash-card-sub">
+              <span>Valor Retornado:</span>
+              <span class="currency-badge currency-purple" id="dash-entries-value">R$ 0,00</span>
+            </div>
+            <div class="dash-card-mini-breakdown">
+              <span style="color: #a78bfa;" id="dash-return-rate-badge">● Taxa de Retorno Ativa</span>
+            </div>
+          </div>
+
+          <div class="dash-card dash-card-cost">
+            <div class="dash-card-header">
+              <div>
+                <span class="dash-card-label">Tabela de Custos Homologada</span>
+                <div class="dash-card-main-val" style="color: #34d399; font-size: 1.35rem;">PBR R$ 89,90</div>
+              </div>
+              <div class="dash-card-icon icon-amber">💰</div>
+            </div>
+            <div class="dash-card-sub">
+              <span>Valor Referencial:</span>
+              <span class="currency-badge currency-amber">Contábil / Ativo</span>
+            </div>
+            <div class="dash-card-mini-breakdown">
+              <span>Desc: <strong style="color: #cbd5e1;">R$ 59,90</strong></span> • <span>CHEP: <strong style="color: #60a5fa;">R$ 100,90</strong></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SEÇÃO DE GRÁFICOS 1: Linha do Tempo (Área Spline) & Rosca de Composição -->
+        <div class="charts-row-main">
+          
+          <!-- Gráfico de Fluxo Temporal (Linha/Área) -->
+          <div class="panel-card chart-card-timeline">
+            <div class="panel-header">
+              <div class="chart-header-info">
+                <h2 class="panel-title">
+                  <span>📈</span> Fluxo Diário de Paletes: Saídas vs. Entradas
+                </h2>
+                <span class="chart-subtitle">Histórico diário de transferências para lojas vs devoluções para o CD</span>
+              </div>
+              <div class="chart-view-toggle">
+                <button type="button" class="view-toggle-btn active" id="btn-toggle-view-units">Unidades</button>
+                <button type="button" class="view-toggle-btn" id="btn-toggle-view-reais">Valor (R$)</button>
+              </div>
+            </div>
+            <div class="panel-body chart-body">
+              <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
+                <canvas id="chart-flow-timeline"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico de Rosca: Composição de Modelos -->
+          <div class="panel-card chart-card-doughnut">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">
+                  <span>🍩</span> Saldo por Modelo
+                </h2>
+                <span class="chart-subtitle">PBR vs Descartável vs CHEP</span>
+              </div>
+            </div>
+            <div class="panel-body chart-body chart-doughnut-body">
+              <div class="doughnut-wrapper">
+                <canvas id="chart-models-doughnut" width="190" height="190"></canvas>
+                <div class="doughnut-center-info">
+                  <span class="doughnut-center-number" id="doughnut-total-pallets">0</span>
+                  <span class="doughnut-center-sub">Total Paletes</span>
+                </div>
+              </div>
+              <div class="doughnut-legend" id="doughnut-legend-container">
+                <!-- Populado dinamicamente -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SEÇÃO DE GRÁFICOS 2: Entregas por Veículo & Distribuição por Loja -->
+        <div class="charts-row-secondary">
+          
+          <!-- Ranking de Veículos (Barras Horizontais) -->
+          <div class="panel-card chart-card-vehicles">
+            <div class="panel-header">
+              <div class="chart-header-info">
+                <h2 class="panel-title">
+                  <span>🚛</span> Entregas por Veículo (Ranking por Placa)
+                </h2>
+                <span class="chart-subtitle">Volume transportado e valor sob custódia de cada veículo</span>
+              </div>
+            </div>
+            <div class="panel-body chart-body">
+              <div class="chart-container" style="position: relative; height: 240px; width: 100%;">
+                <canvas id="chart-vehicles-bar"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distribuição por Loja de Destino (Barras Verticais) -->
+          <div class="panel-card chart-card-stores">
+            <div class="panel-header">
+              <div class="chart-header-info">
+                <h2 class="panel-title">
+                  <span>🏬</span> Transferências por Loja de Destino
+                </h2>
+                <span class="chart-subtitle">Distribuição dos paletes despachados entre as filiais da rede</span>
+              </div>
+            </div>
+            <div class="panel-body chart-body">
+              <div class="chart-container" style="position: relative; height: 240px; width: 100%;">
+                <canvas id="chart-stores-bar"></canvas>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SEÇÃO 3: Indicador de Auditoria/Conferência & Cards dos 3 Modelos -->
+        <div class="dashboard-two-col">
+          
+          <!-- Card Indicador de Auditoria & Acurácia com Gauge / Donut -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">
+                  <span>🎯</span> Indicador de Conferência por Palete
+                </h2>
+                <span class="chart-subtitle">Auditoria de recebimento vs carga em trânsito</span>
+              </div>
+            </div>
+            <div class="panel-body audit-dashboard-panel">
+              <div class="audit-gauge-row">
+                <div class="audit-gauge-wrap">
+                  <div style="position: relative; width: 150px; height: 150px; margin: 0 auto;">
+                    <canvas id="chart-audit-gauge"></canvas>
+                    <div class="gauge-center-badge">
+                      <span id="audit-rate-display" class="gauge-big-num">100%</span>
+                      <span class="gauge-sub-lbl">Acurácia</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="audit-summary-info">
+                  <div class="audit-meta-line">
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">Paletes em Circulação:</span>
+                    <strong id="audit-total-pallets" style="color: #fff; font-size: 1.25rem;">0 un</strong>
+                  </div>
+                  <div class="audit-meta-line">
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">Valor em Movimentação:</span>
+                    <strong id="audit-total-val" style="color: #34d399; font-size: 1.15rem;">R$ 0,00</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="audit-status-list">
+                <div class="audit-status-item">
+                  <div class="audit-item-label">
+                    <span class="dot-indicator dot-emerald"></span>
+                    <span>Paletes Conferidos / Recebidos na Loja</span>
+                  </div>
+                  <div class="audit-item-val" style="color: #34d399;" id="audit-conferred-count">0 un</div>
+                </div>
+
+                <div class="audit-status-item">
+                  <div class="audit-item-label">
+                    <span class="dot-indicator dot-amber"></span>
+                    <span>Paletes em Trânsito na Rodovia</span>
+                  </div>
+                  <div class="audit-item-val" style="color: #fbbf24;" id="audit-transit-count">0 un</div>
+                </div>
+
+                <div class="audit-status-item">
+                  <div class="audit-item-label">
+                    <span class="dot-indicator dot-blue"></span>
+                    <span>Paletes Despachados na Doca do CD</span>
+                  </div>
+                  <div class="audit-item-val" style="color: #60a5fa;" id="audit-shipped-count">0 un</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards dos 3 Modelos de Palete -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">
+                  <span>🪵</span> Saldo Detalhado por Modelo de Palete
+                </h2>
+                <span class="chart-subtitle">PBR: R$ 89,90 • Descartável: R$ 59,90 • CHEP: R$ 100,90</span>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="models-grid">
+                
+                <!-- PBR -->
+                <div class="model-box model-box-pbr">
+                  <div class="model-box-top">
+                    <div class="model-title-wrap">
+                      <span class="model-name">Palete PBR</span>
+                      <span class="model-tag tag-pbr">R$ 89,90 / un</span>
+                    </div>
+                    <span class="model-box-icon">📦</span>
+                  </div>
+                  <div class="model-stock-display">
+                    <span class="model-stock-num" id="model-pbr-stock">0 un</span>
+                    <span class="model-money-badge" id="model-pbr-val">R$ 0,00</span>
+                  </div>
+                  <div class="model-stats-row">
+                    <span>Entradas: <strong id="model-pbr-in" style="color:#34d399;">+0 un</strong></span>
+                    <span>Saídas: <strong id="model-pbr-out" style="color:#f87171;">-0 un</strong></span>
+                  </div>
+                </div>
+
+                <!-- Descartável -->
+                <div class="model-box model-box-descartavel">
+                  <div class="model-box-top">
+                    <div class="model-title-wrap">
+                      <span class="model-name">Descartável</span>
+                      <span class="model-tag tag-descartavel">R$ 59,90 / un</span>
+                    </div>
+                    <span class="model-box-icon">♻️</span>
+                  </div>
+                  <div class="model-stock-display">
+                    <span class="model-stock-num" id="model-desc-stock">0 un</span>
+                    <span class="model-money-badge" id="model-desc-val">R$ 0,00</span>
+                  </div>
+                  <div class="model-stats-row">
+                    <span>Entradas: <strong id="model-desc-in" style="color:#34d399;">+0 un</strong></span>
+                    <span>Saídas: <strong id="model-desc-out" style="color:#f87171;">-0 un</strong></span>
+                  </div>
+                </div>
+
+                <!-- CHEP -->
+                <div class="model-box model-box-chep">
+                  <div class="model-box-top">
+                    <div class="model-title-wrap">
+                      <span class="model-name">Palete CHEP</span>
+                      <span class="model-tag tag-chep">R$ 100,90 / un</span>
+                    </div>
+                    <span class="model-box-icon">🔷</span>
+                  </div>
+                  <div class="model-stock-display">
+                    <span class="model-stock-num" id="model-chep-stock">0 un</span>
+                    <span class="model-money-badge" id="model-chep-val">R$ 0,00</span>
+                  </div>
+                  <div class="model-stats-row">
+                    <span>Entradas: <strong id="model-chep-in" style="color:#34d399;">+0 un</strong></span>
+                    <span>Saídas: <strong id="model-chep-out" style="color:#f87171;">-0 un</strong></span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Barra de Distribuição Visual -->
+              <div style="margin-top: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                  <span>Composição Física do Saldo no CD:</span>
+                  <span id="stock-dist-labels">PBR / Descartável / CHEP</span>
+                </div>
+                <div class="stock-bar-container">
+                  <div id="bar-seg-pbr" class="stock-bar-segment segment-pbr" style="width: 50%;" title="PBR"></div>
+                  <div id="bar-seg-desc" class="stock-bar-segment segment-descartavel" style="width: 25%;" title="Descartável"></div>
+                  <div id="bar-seg-chep" class="stock-bar-segment segment-chep" style="width: 25%;" title="CHEP"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TABELAS OPERACIONAIS: Veículos e Registro de Entradas -->
+        <div class="dashboard-tables-grid">
+          
+          <!-- Entregas por Veículo -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">
+                  <span>🚛</span> Detalhamento de Entregas por Veículo
+                </h2>
+                <span class="chart-subtitle">Consolidado por placa e viagens</span>
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Placa do Veículo</th>
+                      <th style="text-align: center;">Viagens</th>
+                      <th style="text-align: right;">Paletes Transportados</th>
+                      <th style="text-align: right;">Valor da Carga (R$)</th>
+                      <th style="text-align: center;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vehicle-deliveries-tbody">
+                    <!-- Populado dinamicamente -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registro de Entradas e Devoluções de Paletes -->
+          <div class="panel-card">
+            <div class="panel-header" style="flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h2 class="panel-title">
+                  <span>📥</span> Histórico de Entradas & Devoluções de Paletes
+                </h2>
+                <span class="chart-subtitle">Paletes retornados das filiais ao CD</span>
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Data</th>
+                      <th>Origem (Loja)</th>
+                      <th>Modelo</th>
+                      <th style="text-align: right;">Qtd</th>
+                      <th style="text-align: right;">Valor (R$)</th>
+                      <th>Placa</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="entries-table-tbody">
+                    <!-- Populado dinamicamente -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ABA 1: NOVA EXPEDIÇÃO & ETIQUETAS -->
+    <div class="tab-content-panel active" id="tab-new-expedition">
+      <div class="expedition-grid">
+
+        <!-- Formulário de Expedição -->
+        <aside class="panel-card no-print" aria-labelledby="form-title">
+          <div class="panel-header">
+            <h2 class="panel-title" id="form-title">
+              <span>📝</span> Dados da Carga / Transferência
+            </h2>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">Campos (*) obrigatórios</span>
+          </div>
+
+          <form id="form-expedition" class="panel-body" onsubmit="event.preventDefault();">
+            
+            <!-- Loja de Destino -->
+            <div class="form-group">
+              <label for="input-store" class="form-label">
+                <span>Loja de Destino (Transferência)<span class="label-required">*</span></span>
+                <button type="button" id="btn-new-store-quick" class="quick-pill" title="Adicionar nova loja rapidamente">
+                  + Nova Loja
+                </button>
+              </label>
+              <select id="input-store" class="form-select" required aria-required="true">
+                <!-- Populado via JS -->
+              </select>
+            </div>
+
+            <!-- Modelo do Palete e Valor Unitário -->
+            <div class="form-group">
+              <label for="input-pallet-model" class="form-label">
+                <span>Modelo do Palete<span class="label-required">*</span></span>
+                <span id="form-model-cost-badge" style="font-size: 0.75rem; color: #34d399; font-weight: 700;">Custo: R$ 89,90 / un</span>
+              </label>
+              <select id="input-pallet-model" class="form-select" required>
+                <option value="PBR" selected>PBR (Padrão Brasil) — R$ 89,90</option>
+                <option value="Descartável">Descartável (One-Way) — R$ 59,90</option>
+                <option value="CHEP">CHEP (Palete Azul) — R$ 100,90</option>
+              </select>
+            </div>
+
+            <!-- Quantidade de Paletes -->
+            <div class="form-group">
+              <label for="input-pallets-count" class="form-label">
+                <span>Quantidade de Paletes (Volumes)<span class="label-required">*</span></span>
+                <span id="form-pallets-cost-preview" style="font-size: 0.75rem; color: #34d399; font-weight: 700;">Valor Carga: R$ 269,70</span>
+              </label>
+              <div class="pallet-stepper">
+                <button type="button" class="stepper-btn" id="btn-minus-pallet" aria-label="Diminuir paletes">−</button>
+                <input type="number" id="input-pallets-count" class="stepper-input" value="3" min="1" max="99" required>
+                <button type="button" class="stepper-btn" id="btn-plus-pallet" aria-label="Aumentar paletes">+</button>
+              </div>
+              <div class="quick-pallet-pills">
+                <button type="button" class="quick-pill" data-value="1">1 Palete</button>
+                <button type="button" class="quick-pill" data-value="2">2 Paletes</button>
+                <button type="button" class="quick-pill" data-value="4">4 Paletes</button>
+                <button type="button" class="quick-pill" data-value="8">8 Paletes</button>
+                <button type="button" class="quick-pill" data-value="12">12 Paletes</button>
+                <button type="button" class="quick-pill" data-value="24">24 (Carreta)</button>
+              </div>
+            </div>
+
+            <!-- Placa do Veículo -->
+            <div class="form-group">
+              <label for="input-plate" class="form-label">
+                <span>Placa do Veículo<span class="label-required">*</span></span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Mercosul ou Padrão</span>
+              </label>
+              <div class="plate-input-wrapper">
+                <span class="plate-flag" aria-hidden="true">🇧🇷</span>
+                <input type="text" id="input-plate" class="form-input plate-input" placeholder="BRA2E19" value="BRA2E19" maxlength="8" required>
+              </div>
+            </div>
+
+            <!-- Nome do Conferente -->
+            <div class="form-group">
+              <label for="input-checker" class="form-label">
+                <span>Nome do Conferente (Expedição)<span class="label-required">*</span></span>
+                <button type="button" id="btn-new-checker-quick" class="quick-pill" title="Adicionar novo conferente">
+                  + Novo
+                </button>
+              </label>
+              <select id="input-checker" class="form-select" required>
+                <!-- Populado via JS -->
+              </select>
+            </div>
+
+            <!-- Data da Expedição e Doca de Saída -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="input-date" class="form-label">
+                  <span>Data da Expedição<span class="label-required">*</span></span>
+                </label>
+                <input type="date" id="input-date" class="form-input" required>
+              </div>
+
+              <div class="form-group">
+                <label for="input-dock" class="form-label">
+                  <span>Doca de Saída</span>
+                </label>
+                <input type="text" id="input-dock" class="form-input" placeholder="Doca 02" value="Doca 02">
+              </div>
+            </div>
+
+            <!-- Código do Lote / Romaneio -->
+            <div class="form-group">
+              <label for="input-batch-id" class="form-label">
+                <span>Código do Lote / Romaneio</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Identificador Único</span>
+              </label>
+              <input type="text" id="input-batch-id" class="form-input" style="font-family: monospace; font-weight: 700;">
+            </div>
+
+            <!-- Observações -->
+            <div class="form-group">
+              <label for="input-notes" class="form-label">
+                <span>Observações / Lacres</span>
+              </label>
+              <input type="text" id="input-notes" class="form-input" placeholder="Ex: Carga frágil / Lacres nº 4891, 4892">
+            </div>
+
+            <!-- Botões de Ação do Formulário -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+              <button type="button" id="btn-generate-preview" class="btn btn-secondary btn-block">
+                <span>🔄</span> Atualizar Prévia das Etiquetas
+              </button>
+              <button type="button" id="btn-print-all" class="btn btn-primary btn-block btn-lg">
+                <span>🖨️</span> Imprimir Todas as Etiquetas
+              </button>
+              <button type="button" id="btn-print-manifest" class="btn btn-secondary btn-block">
+                <span>📄</span> Imprimir Romaneio da Carga (A4)
+              </button>
+            </div>
+
+          </form>
+        </aside>
+
+        <!-- Área de Pré-Visualização das Etiquetas -->
+        <section class="labels-preview-section no-print" aria-label="Pré-visualização das Etiquetas">
+          
+          <div class="preview-header-bar">
+            <div>
+              <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff;">
+                🏷️ Prévia das Etiquetas de Volume
+              </h2>
+              <p id="preview-meta-summary" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                Carregando etiquetas...
+              </p>
+            </div>
+
+            <div class="format-selector">
+              <label for="select-print-format" style="font-weight: 600;">Formato de Impressão:</label>
+              <select id="select-print-format" class="form-select" style="width: auto; padding: 0.4rem 0.75rem; font-size: 0.85rem;">
+                <option value="a4_double" selected>2 Etiquetas por Folha A4 (Padrão Sulfite com Linha de Corte)</option>
+                <option value="thermal">Etiqueta Térmica (100x150mm - Padrão Palete Zebra/Argox)</option>
+                <option value="a4_single">1 Etiqueta por Folha A4 (Tamanho Gigante)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Grade de Etiquetas Pré-visualizadas -->
+          <div id="labels-canvas" class="labels-canvas">
+            <!-- As etiquetas são geradas dinamicamente aqui via app.js -->
+          </div>
+
+          <!-- Estado Vazio (quando não houver etiquetas) -->
+          <div id="empty-preview-card" class="empty-preview-card" style="display: none;">
+            <div class="empty-icon">📦</div>
+            <h3 class="empty-title">Nenhuma etiqueta para exibir</h3>
+            <p>Selecione a loja e preencha os dados no painel ao lado para gerar as etiquetas de palete.</p>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ABA 2: HISTÓRICO & ROMANEIOS -->
+    <div class="tab-content-panel no-print" id="tab-history" style="display: none;">
+      <div class="panel-card">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 class="panel-title"><span>📋</span> Histórico de Expedições & Controle de Paletes</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Consulte transferências anteriores, anexe fotos dos volumes carregados no caminhão, reimprima etiquetas e emita romaneios.
+            </p>
+          </div>
+
+          <!-- Filtros de Busca -->
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="history-search-input" class="form-input" placeholder="🔍 Buscar por lote, loja, conferente ou placa..." style="width: 280px; padding: 0.5rem 0.85rem;">
+            <select id="history-filter-store" class="form-select" style="width: auto; padding: 0.5rem 0.85rem;">
+              <option value="all">Todas as Lojas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Histórico de Expedições">
+              <thead>
+                <tr>
+                  <th>Lote / Código</th>
+                  <th>Data</th>
+                  <th>Loja de Destino</th>
+                  <th>Volumes</th>
+                  <th>Placa Veículo</th>
+                  <th>Conferente</th>
+                  <th>Fotos da Carga</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body">
+                <!-- Populado dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 3: GERENCIAR LOJAS & CONFERENTES -->
+    <div class="tab-content-panel no-print" id="tab-settings" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        
+        <!-- Cadastro de Lojas -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2 class="panel-title"><span>🏬</span> Lojas de Transferência Cadastradas</h2>
+          </div>
+          <div class="panel-body">
+            <form id="form-add-store" style="display: grid; grid-template-columns: 100px 1fr 1fr 80px auto; gap: 0.5rem; margin-bottom: 1.25rem;">
+              <input type="text" id="new-store-code" class="form-input" placeholder="Código (LJ-06)">
+              <input type="text" id="new-store-name" class="form-input" placeholder="Nome da Loja" required>
+              <input type="text" id="new-store-city" class="form-input" placeholder="Cidade/UF">
+              <input type="text" id="new-store-dock" class="form-input" placeholder="Doca">
+              <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1rem;">+ Adicionar</button>
+            </form>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Nome da Loja</th>
+                    <th>Cidade / UF</th>
+                    <th>Doca Padrão</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="stores-table-body">
+                  <!-- Populado dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cadastro de Conferentes -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2 class="panel-title"><span>👷</span> Conferentes de Expedição</h2>
+          </div>
+          <div class="panel-body">
+            <form id="form-add-checker" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+              <input type="text" id="new-checker-name" class="form-input" placeholder="Nome Completo do Conferente" required>
+              <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.25rem;">+ Cadastrar</button>
+            </form>
+
+            <div id="checkers-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <!-- Populado dinamicamente -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal de Gestão de Fotos dos Volumes Carregados -->
+  <div id="modal-photos" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" style="max-width: 820px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-photos-title">📷 Fotos dos Volumes Carregados</h2>
+        <button type="button" class="modal-close-btn" id="btn-close-modal-photos">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Anexe registros fotográficos dos paletes posicionados e amarrados no caminhão para comprovação de integridade e conferência na entrega.
+        </p>
+
+        <!-- Zona de Upload / Câmera -->
+        <div class="photo-upload-zone" id="photo-upload-dropzone">
+          <div style="font-size: 2.2rem; margin-bottom: 0.4rem;">📸</div>
+          <div style="font-weight: 700; color: #fff; margin-bottom: 0.25rem;">Clique para Tirar Foto ou Selecionar da Galeria</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Suporta câmera de celular/tablet e arquivos de imagem (JPG, PNG, WEBP)</div>
+          <input type="file" id="input-cargo-photo" accept="image/*" multiple capture="environment" style="display: none;">
+        </div>
+
+        <!-- Grade de Fotos Salvas -->
+        <div id="photos-gallery-container" class="photos-gallery-grid">
+          <!-- Populado via app.js -->
+        </div>
+
+        <!-- Mensagem quando não houver fotos -->
+        <div id="photos-empty-state" style="text-align: center; padding: 2rem; color: var(--text-secondary); display: none;">
+          <div style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.6;">🖼️</div>
+          <p>Nenhuma foto anexada a esta transferência ainda.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-modal-photos-close">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Lightbox para Visualização em Tamanho Real -->
+  <div id="modal-lightbox" class="lightbox-modal" style="display: none;">
+    <button type="button" id="btn-close-lightbox" style="position: absolute; top: 20px; right: 24px; background: transparent; border: none; color: #fff; font-size: 2rem; cursor: pointer;">&times;</button>
+    <img id="lightbox-full-img" class="lightbox-img" src="" alt="Volume carregado ampliado">
+    <p style="color: #94a3b8; margin-top: 12px; font-size: 0.85rem;">Clique fora ou no botão acima para fechar</p>
+  </div>
+
+  <!-- Modal de Registro de Entrada / Retorno de Paletes -->
+  <div id="modal-add-entry" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h2 class="modal-title">📥 Registrar Entrada / Retorno de Paletes</h2>
+        <button type="button" class="modal-close-btn" id="btn-close-modal-entry">&times;</button>
+      </div>
+      <form id="form-add-entry" class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+          Dê entrada no retorno de paletes vazios das filiais ou compras novas para alimentar o saldo do CD (PBR: R$ 89,90 • Descartável: R$ 59,90 • CHEP: R$ 100,90).
+        </p>
+
+        <div class="form-group">
+          <label for="entry-origin" class="form-label">Origem (Loja / Filial / Fornecedor)*</label>
+          <select id="entry-origin" class="form-select" required>
+            <!-- Populado via JS -->
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="entry-model" class="form-label">Modelo do Palete*</label>
+            <select id="entry-model" class="form-select" required>
+              <option value="PBR" selected>PBR — R$ 89,90</option>
+              <option value="Descartável">Descartável — R$ 59,90</option>
+              <option value="CHEP">CHEP — R$ 100,90</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="entry-count" class="form-label">Quantidade de Paletes*</label>
+            <input type="number" id="entry-count" class="form-input" min="1" max="999" value="15" required style="font-weight: 700; font-family: monospace;">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="entry-plate" class="form-label">Placa do Veículo (Entrega)*</label>
+            <input type="text" id="entry-plate" class="form-input plate-input" placeholder="BRA2E19" value="BRA2E19" maxlength="8" required>
+          </div>
+
+          <div class="form-group">
+            <label for="entry-checker" class="form-label">Conferente do Recebimento*</label>
+            <select id="entry-checker" class="form-select" required>
+              <!-- Populado via JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="entry-notes" class="form-label">Observações / Motivo</label>
+          <input type="text" id="entry-notes" class="form-input" placeholder="Ex: Devolução de paletes vazios / Bom estado">
+        </div>
+
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+          <span style="font-size: 0.85rem; color: #34d399; font-weight: 600;">Valor Total da Entrada:</span>
+          <span id="entry-value-preview" style="font-size: 1.25rem; font-weight: 900; color: #34d399; font-family: monospace;">R$ 1.348,50</span>
+        </div>
+
+        <div class="modal-footer" style="padding-left: 0; padding-right: 0; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-entry">Cancelar</button>
+          <button type="submit" class="btn btn-success">✅ Confirmar Entrada no Saldo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sandbox Oculto para Impressão Direta (@media print) -->
+  <div id="print-sandbox" aria-hidden="true"></div>
+
+  <!-- Container de Toasts de Feedback -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts do Sistema -->
+  <script src="js/chart.umd.min.js"></script>
+  <script src="js/barcode.js"></script>
+  <script src="js/qrcode.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

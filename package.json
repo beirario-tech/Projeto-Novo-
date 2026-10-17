@@ -1,0 +1,12 @@
+{
+  "name": "pallet-flow-pro",
+  "version": "1.0.0",
+  "description": "Sistema de controle logístico de paletes, impressão de etiquetas e transferência entre lojas",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "author": "Antigravity Logística",
+  "license": "MIT"
+}
