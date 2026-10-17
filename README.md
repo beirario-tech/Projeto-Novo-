@@ -2,7 +2,12 @@
 
 Aplicação desenvolvida para controle de volumes e expedição de paletes para transferência entre lojas.
 
-## 🚀 Inicialização Rápida
+## 🌐 Acesso Online (GitHub Pages)
+
+A aplicação está publicada e pronta para uso em:
+👉 **[https://matheusvictorfernandesromeu4-tech.github.io/Projeto-Novo-/](https://matheusvictorfernandesromeu4-tech.github.io/Projeto-Novo-/)**
+
+## 🚀 Execução Local
 
 1. Abra o terminal no diretório do projeto e execute:
 ```bash
