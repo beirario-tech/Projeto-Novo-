@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Paletes & Expedição | Sistema de Transferência entre Lojas</title>
-  <meta name="description" content="Sistema profissional de controle logístico de paletes, geração e impressão de etiquetas para colar nos volumes com código de barras, QR code e romaneio de carga.">
-  <meta name="theme-color" content="#0b0f19">
+  <title>Beira Rio | Controle de Paletes & Expedição de Transferência</title>
+  <meta name="description" content="Sistema oficial da Beira Rio Construção e Acabamento para controle logístico de paletes, identificação de volumes com código de barras, QR Code e emissão de romaneios.">
+  <meta name="theme-color" content="#0a0d14">
+  <link rel="icon" type="image/png" href="img/emblem.png">
+  <link rel="apple-touch-icon" href="img/emblem.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,13 +22,16 @@
   <!-- Barra Superior / Header -->
   <header class="app-header no-print">
     <div class="brand-wrapper">
-      <div class="brand-icon" aria-hidden="true">📦</div>
+      <div class="brand-logo-card">
+        <img src="img/logo.png" alt="Beira Rio Construção e Acabamento" class="brand-header-logo">
+      </div>
+      <div class="brand-divider" aria-hidden="true"></div>
       <div class="brand-text">
-        <h1>
-          PalletFlow Pro
-          <span class="brand-badge">Logística & Expedição</span>
-        </h1>
-        <p class="brand-subtitle">Controle de Paletes e Impressão de Volumes de Transferência</p>
+        <div class="brand-heading-row">
+          <span class="brand-system-name">PalletFlow Pro</span>
+          <span class="brand-badge">CD Central • Expedição</span>
+        </div>
+        <p class="brand-subtitle">Controle de Paletes & Impressão de Volumes de Transferência</p>
       </div>
     </div>
 
@@ -58,7 +63,7 @@
     <!-- KPI Cards de Desempenho Logístico -->
     <section class="kpi-grid no-print" aria-label="Métricas da Operação">
       <div class="kpi-card">
-        <div class="kpi-icon kpi-blue">📦</div>
+        <div class="kpi-icon kpi-red">📦</div>
         <div class="kpi-info">
           <div class="kpi-label">Paletes Expedidos Hoje</div>
           <div class="kpi-value" id="kpi-today-pallets">0</div>
@@ -125,14 +130,14 @@
         <!-- Banner de Patrimônio Total & Ticker Financeiro -->
         <div class="dash-asset-banner">
           <div class="asset-banner-left">
-            <span class="asset-banner-tag">PATRIMÔNIO ATIVO EM PALETES</span>
+            <span class="asset-banner-tag">PATRIMÔNIO ATIVO EM PALETES • BEIRA RIO</span>
             <div class="asset-banner-val-wrap">
               <span class="asset-banner-currency">R$</span>
               <span class="asset-banner-number" id="dash-banner-total-val">0,00</span>
-              <span class="asset-banner-badge" id="dash-banner-change">● Saldo em Armazém</span>
+              <span class="asset-banner-badge" id="dash-banner-change">● Saldo no CD</span>
             </div>
             <div class="asset-banner-sub">
-              Valoração por Modelo: <strong style="color: #f59e0b;">PBR R$ 89,90</strong> • <strong style="color: #94a3b8;">Desc. R$ 59,90</strong> • <strong style="color: #3b82f6;">CHEP R$ 100,90</strong> • Saldo Físico: <strong id="dash-banner-pallets-count" style="color: #60a5fa;">0 unidades</strong>
+              Valoração por Modelo: <strong style="color: #f59e0b;">PBR R$ 89,90</strong> • <strong style="color: #94a3b8;">Desc. R$ 59,90</strong> • <strong style="color: #60a5fa;">CHEP R$ 100,90</strong> • Saldo Físico: <strong id="dash-banner-pallets-count" style="color: #ff545d;">0 unidades</strong>
             </div>
           </div>
           <div class="asset-banner-stats">
@@ -180,14 +185,14 @@
                 <span class="dash-card-label">Saídas (Transferências)</span>
                 <div class="dash-card-main-val" id="dash-exits-total">0</div>
               </div>
-              <div class="dash-card-icon icon-blue">📤</div>
+              <div class="dash-card-icon icon-red">📤</div>
             </div>
             <div class="dash-card-sub">
               <span>Total Expedido:</span>
-              <span class="currency-badge currency-blue" id="dash-exits-value">R$ 0,00</span>
+              <span class="currency-badge currency-red" id="dash-exits-value">R$ 0,00</span>
             </div>
             <div class="dash-card-mini-breakdown">
-              <span style="color: #60a5fa;">● Envio contínuo para filiais</span>
+              <span style="color: #ff545d;">● Envio contínuo para filiais</span>
             </div>
           </div>
 

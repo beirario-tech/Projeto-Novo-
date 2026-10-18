@@ -268,7 +268,7 @@
 
   const DEFAULT_SETTINGS = {
     labelFormat: 'a4_double', // 'a4_double', 'thermal', 'a4_single'
-    companyName: 'CENTRO DE DISTRIBUIÇÃO & LOGÍSTICA',
+    companyName: 'BEIRA RIO - CONSTRUÇÃO E ACABAMENTO',
     palletUnitCost: 89.90,
     palletPrices: { ...PALLET_PRICES },
     showBarcode: true,
@@ -462,7 +462,11 @@
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (!data) return { ...DEFAULT_SETTINGS };
       try {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
+        const parsed = JSON.parse(data);
+        if (!parsed.companyName || parsed.companyName === 'CENTRO DE DISTRIBUIÇÃO & LOGÍSTICA') {
+          parsed.companyName = DEFAULT_SETTINGS.companyName;
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
       } catch (e) {
         return { ...DEFAULT_SETTINGS };
       }

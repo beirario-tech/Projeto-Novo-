@@ -878,10 +878,16 @@
     return `
       ${headerActions}
       <div class="printable-pallet-sheet">
-        <!-- Cabeçalho -->
+        <!-- Cabeçalho Institucional Beira Rio -->
         <div class="lbl-header">
-          <div class="lbl-company">${state.settings.companyName}</div>
-          <div style="display: flex; gap: 4px; align-items: center;">
+          <div class="lbl-company-wrap">
+            <img src="img/logo-light.png" alt="Beira Rio - Construção e Acabamento" class="lbl-logo-img">
+            <div class="lbl-company-info">
+              <span class="lbl-company-name">BEIRA RIO</span>
+              <span class="lbl-company-tag">CONSTRUÇÃO E ACABAMENTO</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center;">
             <span class="lbl-model-badge">${shipment.palletModel || 'PBR'}</span>
             <div class="lbl-operation">TRANSFERÊNCIA</div>
           </div>
@@ -1077,13 +1083,19 @@
 
     const manifestHtml = `
       <div class="printable-manifest-sheet" style="font-family: Arial, sans-serif; color: #000; padding: 15px;">
-        <div style="border-bottom: 3px solid #000; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
-          <div>
-            <h1 style="font-size: 18px; font-weight: 900; margin: 0;">${state.settings.companyName}</h1>
-            <p style="font-size: 12px; font-weight: bold; margin: 2px 0 0 0; text-transform: uppercase;">ROMANEIO DE TRANSFERÊNCIA DE PALETES</p>
+        <div style="border-bottom: 3.5px solid #eb1c25; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <img src="img/logo-light.png" alt="Beira Rio" style="height: 48px; max-width: 170px; object-fit: contain;">
+            <div>
+              <h1 style="font-size: 18px; font-weight: 900; margin: 0; color: #00427a; line-height: 1.1;">BEIRA RIO</h1>
+              <div style="font-size: 11px; font-weight: 800; color: #eb1c25; letter-spacing: 0.05em; text-transform: uppercase;">CONSTRUÇÃO E ACABAMENTO</div>
+              <p style="font-size: 11px; font-weight: 700; color: #334155; margin: 3px 0 0 0; text-transform: uppercase;">ROMANEIO DE TRANSFERÊNCIA DE PALETES</p>
+            </div>
           </div>
           <div style="text-align: right; font-size: 11px;">
-            <strong>LOTE:</strong> ${shipment.id}<br>
+            <div style="background: #00427a; color: #fff; padding: 3px 8px; border-radius: 3px; font-weight: bold; margin-bottom: 4px; display: inline-block;">
+              LOTE: ${shipment.id}
+            </div><br>
             <strong>EMISSÃO:</strong> ${shipment.dateFormatted} às ${shipment.time || ''}
           </div>
         </div>
@@ -1127,11 +1139,11 @@
         <h3 style="font-size: 13px; text-transform: uppercase; margin-bottom: 6px;">Checklist de Volumes (Paletes Embarcados)</h3>
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11px;">
           <thead>
-            <tr style="background: #e5e5e5;">
-              <th style="border: 1px solid #000; padding: 5px;">Volume</th>
-              <th style="border: 1px solid #000; padding: 5px;">Código Rastreável</th>
-              <th style="border: 1px solid #000; padding: 5px;">Tipo</th>
-              <th style="border: 1px solid #000; padding: 5px;">Conferência no Destino</th>
+            <tr style="background: #00427a; color: #fff;">
+              <th style="border: 1px solid #00427a; padding: 6px; color: #fff;">Volume</th>
+              <th style="border: 1px solid #00427a; padding: 6px; color: #fff;">Código Rastreável</th>
+              <th style="border: 1px solid #00427a; padding: 6px; color: #fff;">Tipo</th>
+              <th style="border: 1px solid #00427a; padding: 6px; color: #fff;">Conferência no Destino</th>
             </tr>
           </thead>
           <tbody>
@@ -1680,10 +1692,10 @@
     const exitsData = analytics.timeline.map(t => isCurrency ? (t.exits * unitCost) : t.exits);
     const entriesData = analytics.timeline.map(t => isCurrency ? (t.entries * unitCost) : t.entries);
 
-    // Gradientes luminosos
-    const gradBlue = ctx.createLinearGradient(0, 0, 0, 260);
-    gradBlue.addColorStop(0, 'rgba(59, 130, 246, 0.45)');
-    gradBlue.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+    // Gradientes luminosos Beira Rio (Vermelho Saídas, Verde/Esmeralda Entradas)
+    const gradRed = ctx.createLinearGradient(0, 0, 0, 260);
+    gradRed.addColorStop(0, 'rgba(235, 28, 37, 0.45)');
+    gradRed.addColorStop(1, 'rgba(235, 28, 37, 0.0)');
 
     const gradGreen = ctx.createLinearGradient(0, 0, 0, 260);
     gradGreen.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
@@ -1701,12 +1713,12 @@
           {
             label: isCurrency ? 'Saídas (R$)' : 'Saídas / Expedições (un)',
             data: exitsData,
-            borderColor: '#3b82f6',
-            backgroundColor: gradBlue,
+            borderColor: '#eb1c25',
+            backgroundColor: gradRed,
             borderWidth: 3,
             tension: 0.38,
             fill: true,
-            pointBackgroundColor: '#3b82f6',
+            pointBackgroundColor: '#eb1c25',
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             pointRadius: 5,
@@ -1750,7 +1762,7 @@
             backgroundColor: 'rgba(15, 23, 42, 0.95)',
             titleColor: '#fff',
             bodyColor: '#cbd5e1',
-            borderColor: 'rgba(59, 130, 246, 0.4)',
+            borderColor: 'rgba(235, 28, 37, 0.4)',
             borderWidth: 1,
             padding: 12,
             boxPadding: 6,
@@ -1915,7 +1927,7 @@
         datasets: [{
           label: 'Paletes Transportados',
           data: data,
-          backgroundColor: '#3b82f6',
+          backgroundColor: '#00427a',
           borderRadius: 6,
           borderSkipped: false
         }]
